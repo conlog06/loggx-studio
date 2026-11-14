@@ -79,12 +79,14 @@ void Playback::play() {
 void Playback::pause() {
     timer_.stop();
     for (auto& p : players_) p.player->pause();
-    if (synth_) synth_->stop(); synth_.reset(); stream_.reset();
+    if (synth_) synth_->stop();
+    synth_.reset(); stream_.reset();
     if (playing_) { playing_ = false; emit playingChanged(false); }
 }
 void Playback::toggle() { playing_ ? pause() : play(); }
 void Playback::startSynth() {
-    if (synth_) synth_->stop(); synth_.reset(); stream_.reset();
+    if (synth_) synth_->stop();
+    synth_.reset(); stream_.reset();
     const auto device = QMediaDevices::defaultAudioOutput();
     if (device.isNull()) return;
     QAudioFormat format; format.setSampleRate(48000); format.setChannelCount(2); format.setSampleFormat(QAudioFormat::Float);

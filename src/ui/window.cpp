@@ -57,10 +57,10 @@ QDoubleSpinBox* number(double lo, double hi, double step, const QString& suffix 
     auto* spin = new QDoubleSpinBox; spin->setRange(lo,hi); spin->setSingleStep(step); spin->setDecimals(2);
     spin->setSuffix(suffix); spin->setKeyboardTracking(false); return spin;
 }
-QScrollArea* scroll(QWidget* widget, bool resize = true) {
+QScrollArea* makeScrollArea(QWidget* widget, bool resize = true) {
     auto* area = new QScrollArea; area->setWidget(widget); area->setWidgetResizable(resize); area->setFrameShape(QFrame::NoFrame); return area;
 }
-const char* style = R"(
+const char* studioStyle = R"(
 QMainWindow,QDialog { background:#111318; color:#e5e8f0; }
 QWidget { color:#dfe4ef; font-size:12px; }
 QMenuBar,QMenu { background:#1b1e26; color:#dfe4ef; }
@@ -100,7 +100,7 @@ QToolTip { background:#303746; color:#eef2fa; border:1px solid #526079; }
 )";
 }
 Window::Window(QWidget* parent) : QMainWindow(parent), document_(this), playback_(this), importer_(this), renders_(this) {
-    setStyleSheet(QString::fromUtf8(style)); setAcceptDrops(true); setMinimumSize(1060,720); resize(1480,940);
+    setStyleSheet(QString::fromUtf8(studioStyle)); setAcceptDrops(true); setMinimumSize(1060,720); resize(1480,940);
     buildUi();
     connect(&document_,&Document::changed,this,[this] { playback_.setProject(document_.project()); refresh(); });
     connect(document_.history(),&QUndoStack::cleanChanged,this,[this] { refresh(); });
@@ -177,7 +177,7 @@ void Window::buildUi() {
     workspace_->addWidget(colorPage()); workspace_->addWidget(musicPage()); workspace_->addWidget(exportPage());
     workspace_->setMinimumWidth(255); upper->addWidget(workspace_);
     auto* monitor = new QWidget; auto* ml = new QVBoxLayout(monitor); ml->setContentsMargins(8,0,8,0);
-    auto* monitorHeader = new QHBoxLayout; monitorHeader->addWidget(heading("PROGRAMM")); monitorHeader->addStretch(); monitorHeader->addWidget(help("Vorschau · 720p")); ml->addLayout(monitorHeader);
+    auto* monitorHeader = new QHBoxLayout; monitorHeader->addWidget(heading("PROGRAMM")); monitorHeader->addStretch(); monitorHeader->addWidget(help("Vorschau · max. 1280 px breit")); ml->addLayout(monitorHeader);
     preview_ = new QLabel("Medien importieren oder ein Musik-Pattern erstellen"); preview_->setObjectName("preview"); preview_->setAlignment(Qt::AlignCenter); preview_->setWordWrap(true); preview_->setMinimumSize(340,210); preview_->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Expanding); ml->addWidget(preview_,1);
     auto* transport = new QHBoxLayout; time_ = new QLabel("00:00:00:00"); time_->setObjectName("timecode"); transport->addWidget(time_); transport->addStretch();
     transport->addWidget(button("|◀",[this] { playback_.seek(0); })); play_ = button("Wiedergabe",[this] { playback_.toggle(); }); transport->addWidget(play_);
@@ -189,7 +189,7 @@ void Window::buildUi() {
     auto* snap = new QCheckBox("Beat-Snap"); snap->setChecked(true); tools->addWidget(snap);
     tools->addStretch(); tools->addWidget(help("TEMPO")); tempo_ = number(20,300,1," BPM"); tempo_->setValue(120); tempo_->setFixedWidth(110); tools->addWidget(tempo_);
     auto* zoom = new QSlider(Qt::Horizontal); zoom->setRange(10,180); zoom->setValue(48); zoom->setFixedWidth(120); tools->addWidget(help("Zoom")); tools->addWidget(zoom); tl->addLayout(tools);
-    timeline_ = new Timeline(&document_); tl->addWidget(scroll(timeline_,false)); mainSplit->addWidget(timelinePanel); mainSplit->setSizes({480,300}); layout->addWidget(mainSplit,1);
+    timeline_ = new Timeline(&document_); tl->addWidget(makeScrollArea(timeline_,false)); mainSplit->addWidget(timelinePanel); mainSplit->setSizes({480,300}); layout->addWidget(mainSplit,1);
     tabs_ = new QTabBar; tabs_->setExpanding(true); tabs_->addTab("01  Medien"); tabs_->addTab("02  Schnitt"); tabs_->addTab("03  Farbe"); tabs_->addTab("04  Musik"); tabs_->addTab("05  Export"); layout->addWidget(tabs_);
     connect(tabs_,&QTabBar::currentChanged,this,[this](int index) { currentWorkspace_ = index; workspace_->setCurrentIndex(index); }); tabs_->setCurrentIndex(1);
     connect(zoom,&QSlider::valueChanged,timeline_,[this](int value) { timeline_->setZoom(value); });
@@ -223,7 +223,7 @@ QWidget* Window::inspector() {
     connect(fadeIn_,&QDoubleSpinBox::editingFinished,this,[this] { changeClip("Fade ändern",[this](Clip& c) { c.fadeIn = fadeIn_->value(); }); });
     connect(fadeOut_,&QDoubleSpinBox::editingFinished,this,[this] { changeClip("Fade ändern",[this](Clip& c) { c.fadeOut = fadeOut_->value(); }); });
     l->addSpacing(10); l->addWidget(button("Clip umbenennen",[this] { const auto* c = document_.project().findClip(timeline_->selected()); if (!c) return; bool ok; const auto name = QInputDialog::getText(this,"Clip umbenennen","Name",QLineEdit::Normal,c->name,&ok); if (ok && !name.trimmed().isEmpty()) changeClip("Clip umbenennen",[&](Clip& clip) { clip.name = name.trimmed(); }); }));
-    l->addWidget(help("Audio-Fades wirken auf den Ton. Farbkorrekturen findest du im Arbeitsbereich Farbe.")); l->addStretch(); return scroll(panel);
+    l->addWidget(help("Audio-Fades wirken auf den Ton. Farbkorrekturen findest du im Arbeitsbereich Farbe.")); l->addStretch(); return makeScrollArea(panel);
 }
 QWidget* Window::colorPage() {
     auto* page = new QWidget; auto* l = new QVBoxLayout(page); l->addWidget(heading("BASIS-FARBKORREKTUR")); l->addWidget(help("Videoclip auswählen und Bild anpassen. Die Vorschau zeigt eine Näherung; der Export verwendet FFmpeg eq."));
@@ -251,7 +251,7 @@ QWidget* Window::musicPage() {
         const auto id = timeline_->selected(); document_.change("Instrument wechseln",[&](Project& p) { auto* track = p.trackForClip(id); if (track && track->kind == TrackKind::Instrument) track->instrument = instrument_->currentData().toString(); });
     });
     auto* openPiano = button("Piano-Roll öffnen",[this] { const auto id = timeline_->selected(); if (document_.project().findClip(id)) editPattern(id); }); l->addWidget(openPiano);
-    auto* mixerPanel = new QWidget; mixer_ = new QVBoxLayout(mixerPanel); mixer_->setContentsMargins(0,0,0,0); l->addWidget(heading("MIXER")); l->addWidget(scroll(mixerPanel),1);
+    auto* mixerPanel = new QWidget; mixer_ = new QVBoxLayout(mixerPanel); mixer_->setContentsMargins(0,0,0,0); l->addWidget(heading("MIXER")); l->addWidget(makeScrollArea(mixerPanel),1);
     l->addWidget(help("Panorama wird für Instrumente live und für alle Spuren im Export angewandt. Medienvorschau: Pegel auf 100 % begrenzt, ohne Panorama."));
     return page;
 }
@@ -356,7 +356,7 @@ void Window::editPattern(const QString& id) {
     timeline_->setSelected(id); tabs_->setCurrentIndex(3);
     auto* dialog = new QDialog(this); dialog->setAttribute(Qt::WA_DeleteOnClose); dialog->setWindowTitle("Piano-Roll · "+document_.project().findClip(id)->name); dialog->resize(1000,650);
     auto* l = new QVBoxLayout(dialog); l->addWidget(help("Klick: Note setzen · Ziehen: verschieben · Rechter Rand: Länge · Rechtsklick: löschen · Raster: 1/16\nDrums: C = Kick, C# = Snare, D = Hi-Hat (Muster wiederholt sich alle 3 Halbtöne)."));
-    auto* piano = new PianoRoll(&document_); piano->setClip(id); auto* area = scroll(piano,false); l->addWidget(area,1);
+    auto* piano = new PianoRoll(&document_); piano->setClip(id); auto* area = makeScrollArea(piano,false); l->addWidget(area,1);
     auto* controls = new QHBoxLayout; controls->addWidget(button("Wiedergabe / Pause",[this] { playback_.toggle(); })); controls->addWidget(help("Neue Noten · Velocity"));
     auto* velocity = new QSlider(Qt::Horizontal); velocity->setRange(1,100); velocity->setValue(80); controls->addWidget(velocity); l->addLayout(controls);
     connect(velocity,&QSlider::valueChanged,piano,[piano](int value) { piano->setVelocity(value/100.0); });
@@ -378,7 +378,8 @@ bool Window::confirmDiscard() {
 }
 void Window::newProject() {
     if (importer_.busy()) { QMessageBox::information(this,"Import läuft","Bitte den laufenden Medienimport abwarten."); return; }
-    if (!confirmDiscard()) return; playback_.pause(); QFile::remove(recoveryPath()); path_.clear(); document_.replace(Project::blank());
+    if (!confirmDiscard()) return;
+    playback_.pause(); QFile::remove(recoveryPath()); path_.clear(); document_.replace(Project::blank());
 }
 void Window::openPath(const QString& path) {
     if (importer_.busy()) { QMessageBox::information(this,"Import läuft","Bitte den laufenden Medienimport abwarten."); return; }

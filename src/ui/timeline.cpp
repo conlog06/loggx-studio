@@ -21,7 +21,7 @@ QSize Timeline::sizeHint() const { return {int(header+std::max(30.0,doc_->projec
 void Timeline::setPosition(double seconds) { position_ = seconds; update(); }
 void Timeline::setZoom(double zoom) { zoom_ = zoom; resize(sizeHint()); updateGeometry(); update(); }
 void Timeline::setSelected(const QString& id) { selected_ = id; emit selectionChanged(id); update(); }
-QRectF Timeline::clipRect(const Clip& c, int lane) const { return {header+c.start*zoom_,ruler+lane*row+9,c.duration*zoom_,row-18}; }
+QRectF Timeline::clipRect(const Clip& c, int lane) const { return QRectF(header+c.start*zoom_,ruler+lane*row+9,c.duration*zoom_,row-18); }
 double Timeline::secondsAt(double x) const { return snapTime((x-header)/zoom_,doc_->project().tempo,beatSnap_,doc_->project().fps); }
 void Timeline::paintEvent(QPaintEvent*) {
     QPainter painter(this); painter.setRenderHint(QPainter::Antialiasing);
@@ -111,16 +111,17 @@ void Timeline::mouseMoveEvent(QMouseEvent* e) {
     dragging_ = true;
     const double delta = (current_.x()-press_.x())/zoom_;
     const auto& p = doc_->project();
+    const double minimumLength = std::min(1.0/p.fps,original_.duration/2);
     if (dragMode_ == 1) {
         targetStart_ = snapTime(original_.start+delta,p.tempo,beatSnap_,p.fps); targetEnd_ = targetStart_+original_.duration;
         targetTrack_ = std::clamp(int(current_.y()-ruler)/row,0,int(p.tracks.size())-1);
     } else if (dragMode_ == 2) {
         const double min = std::max(0.0,original_.start-original_.sourceIn);
-        targetStart_ = std::clamp(snapTime(original_.start+delta,p.tempo,beatSnap_,p.fps),min,original_.end()-1.0/p.fps);
+        targetStart_ = std::clamp(snapTime(original_.start+delta,p.tempo,beatSnap_,p.fps),min,original_.end()-minimumLength);
     } else {
         const auto* m = p.findMedia(original_.mediaId);
         const double max = m ? original_.start+m->duration-original_.sourceIn : 86400;
-        targetEnd_ = std::clamp(snapTime(original_.end()+delta,p.tempo,beatSnap_,p.fps),original_.start+1.0/p.fps,max);
+        targetEnd_ = std::clamp(snapTime(original_.end()+delta,p.tempo,beatSnap_,p.fps),original_.start+minimumLength,max);
     }
     update();
 }

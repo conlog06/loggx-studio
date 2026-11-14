@@ -17,7 +17,7 @@ QSize PianoRoll::sizeHint() const {
 QRectF PianoRoll::noteRect(const Note& n) const {
     const auto* c = doc_->project().findClip(clip_);
     const double offset = c ? c->sourceIn*doc_->project().tempo/60 : 0;
-    return {keys+(n.beat-offset)*beatWidth,ruler+(high-n.pitch)*row+2,n.length*beatWidth-2,row-4};
+    return QRectF(keys+(n.beat-offset)*beatWidth,ruler+(high-n.pitch)*row+2,n.length*beatWidth-2,row-4);
 }
 void PianoRoll::paintEvent(QPaintEvent*) {
     QPainter p(this); p.fillRect(rect(),QColor("#151820"));
@@ -38,7 +38,7 @@ void PianoRoll::paintEvent(QPaintEvent*) {
     p.setClipRect(QRect(keys,ruler,width()-keys,height()-ruler));
     for (int i = 0; i < c->notes.size(); ++i) {
         const Note& note = i == note_ ? target_ : c->notes[i];
-        p.setBrush(QColor::fromRgbF(0.48+0.22*note.velocity,0.38+0.15*note.velocity,0.8)); p.setPen(QColor("#d3bcff")); p.drawRoundedRect(noteRect(note),3,3);
+        p.setBrush(QColor::fromRgbF(float(0.48+0.22*note.velocity),float(0.38+0.15*note.velocity),0.8f)); p.setPen(QColor("#d3bcff")); p.drawRoundedRect(noteRect(note),3,3);
     }
     const double end = keys+c->duration*doc_->project().tempo/60*beatWidth;
     p.fillRect(QRectF(end,ruler,width()-end,height()-ruler),QColor(0,0,0,100));
