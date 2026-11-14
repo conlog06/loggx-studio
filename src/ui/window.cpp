@@ -27,6 +27,7 @@
 #include <QMessageBox>
 #include <QMimeData>
 #include <QProgressBar>
+#include <QPixmap>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QScrollBar>
@@ -135,6 +136,10 @@ void Window::buildUi() {
     file->addAction("Projekt öffnen …",QKeySequence::Open,this,[this] { const auto path = QFileDialog::getOpenFileName(this,"Projekt öffnen",{},"LoggX-Projekt (*.loggx)"); if (!path.isEmpty()) openPath(path); });
     file->addAction("Speichern",QKeySequence::Save,this,[this] { save(); });
     file->addAction("Speichern unter …",QKeySequence::SaveAs,this,[this] { save(true); });
+    file->addAction("Projekt umbenennen …",this,[this] {
+        bool ok; const auto name = QInputDialog::getText(this,"Projektname","Name",QLineEdit::Normal,document_.project().name,&ok);
+        if (ok && !name.trimmed().isEmpty()) document_.change("Projekt umbenennen",[&](Project& p) { p.name = name.trimmed(); });
+    });
     file->addSeparator(); file->addAction("Medien importieren …",QKeySequence("Ctrl+I"),this,[this] { importFiles(); });
     file->addAction("Fehlendes Medium neu verknüpfen …",this,[this] {
         auto* item = media_->currentItem(); if (!item) return;

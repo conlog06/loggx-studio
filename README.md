@@ -69,7 +69,7 @@ Auf macOS verwenden die Standardaktionen die üblichen Command-Tasten.
 - Quellmedien bleiben externe Dateien. Ein Projekt enthält keine Kopien. Neuverknüpfen erwartet dasselbe Originalmedium; die bisherige Dauer/Stream-Struktur bleibt erhalten.
 - Keine Video-Überblendungen, Keyframes, Masken, Proxy-Generierung, MIDI-Dateien/Keyboard-Eingabe, Audioaufnahme, Sampler, Time-Stretch, VST/AU/CLAP oder KI.
 - Kein Login, Lizenzsystem oder Admin-Backend. Lokal gibt es keinen unsicheren „Admin-Schalter“, der serverseitige Rechte vortäuscht.
-- Autosave ist für eine App-Instanz vorgesehen. Große Projekte und viele gleichzeitig laufende Instrumentenstimmen sind noch nicht optimiert.
+- Eine Instanzsperre schützt die gemeinsame Autosave-Datei. Große Projekte und viele gleichzeitig laufende Instrumentenstimmen sind noch nicht optimiert.
 
 ## Aufbau
 

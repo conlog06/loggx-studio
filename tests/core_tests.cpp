@@ -3,6 +3,7 @@
 #include "core/audio.h"
 #include "core/exportplan.h"
 #include <QFile>
+#include <QFileInfo>
 #include <QJsonArray>
 #include <QProcess>
 #include <QStandardPaths>

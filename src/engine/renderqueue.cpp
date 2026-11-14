@@ -33,6 +33,8 @@ void RenderQueue::next() {
             if (QFileInfo::exists(job.destination)) return "Zieldatei existiert bereits. Bitte einen neuen Dateinamen wählen.";
             for (const auto& t : job.project.tracks) for (const auto& c : t.clips) {
                 if (t.kind == TrackKind::Instrument) continue;
+                const bool visual = !job.settings.audioOnly && t.kind == TrackKind::Video && !t.mute;
+                if (!visual && !job.project.audible(t)) continue;
                 const auto* m = job.project.findMedia(c.mediaId);
                 if (!m || !QFileInfo::exists(m->path)) return "Quelldatei fehlt: "+(m ? m->path : c.mediaId);
             }
