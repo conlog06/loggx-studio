@@ -36,7 +36,7 @@ jobs:
         env:
           QT_QPA_PLATFORM: offscreen
       - name: Stage application
-        run: cmake --install build --config Release --prefix dist
+        run: cmake --install build --config Release --prefix "${{ github.workspace }}/dist"
       - name: Native UI smoke test
         if: runner.os == 'Linux'
         run: build/LoggXStudio --smoke-test native-ui.png

@@ -40,7 +40,7 @@ Voraussetzungen: C++20-Compiler (Visual Studio 2022, Xcode/Clang oder GCC), CMak
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON -DCMAKE_PREFIX_PATH=/path/to/Qt/6.8.3/platform
 cmake --build build --config Release --parallel
 ctest --test-dir build -C Release --output-on-failure
-cmake --install build --config Release --prefix dist
+cmake --install build --config Release --prefix /absolute/path/to/dist
 ```
 
 Windows mit Visual Studio: beispielsweise `-DCMAKE_PREFIX_PATH=C:/Qt/6.8.3/msvc2022_64`.
