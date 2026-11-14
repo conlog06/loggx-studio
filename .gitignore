@@ -1,0 +1,7 @@
+/build*/
+/dist/
+/.cache/
+/.qt/
+*.user
+*.autosave.loggx
+.DS_Store
