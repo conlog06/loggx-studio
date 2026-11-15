@@ -5,6 +5,7 @@
 #include <QLockFile>
 #include <QMessageBox>
 #include <QPixmap>
+#include <QPalette>
 #include <QStandardPaths>
 #include <QStyleFactory>
 #include <QTimer>
@@ -15,6 +16,20 @@ int main(int argc, char* argv[]) {
     QCoreApplication::setApplicationName("LoggX Studio");
     QCoreApplication::setApplicationVersion("0.1.0");
     app.setStyle(QStyleFactory::create("Fusion"));
+    QPalette palette;
+    palette.setColor(QPalette::Window,QColor("#171a22"));
+    palette.setColor(QPalette::WindowText,QColor("#dfe4ef"));
+    palette.setColor(QPalette::Base,QColor("#111318"));
+    palette.setColor(QPalette::AlternateBase,QColor("#242a36"));
+    palette.setColor(QPalette::Text,QColor("#dfe4ef"));
+    palette.setColor(QPalette::Button,QColor("#2a2f3b"));
+    palette.setColor(QPalette::ButtonText,QColor("#dfe4ef"));
+    palette.setColor(QPalette::Highlight,QColor("#9c75c9"));
+    palette.setColor(QPalette::HighlightedText,QColor("#ffffff"));
+    palette.setColor(QPalette::PlaceholderText,QColor("#929caf"));
+    palette.setColor(QPalette::Disabled,QPalette::Text,QColor("#737d90"));
+    palette.setColor(QPalette::Disabled,QPalette::ButtonText,QColor("#737d90"));
+    app.setPalette(palette);
     app.setFont(QFont("Segoe UI",10));
     const bool smoke = app.arguments().size() >= 3 && app.arguments().at(1) == "--smoke-test";
     const auto data = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);

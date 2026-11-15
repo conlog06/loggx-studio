@@ -7,6 +7,7 @@
 | CMake / C++20 | Build | Quellcode-Build und CI |
 
 Qt: https://www.qt.io/licensing/ und die Lizenztexte der konkret eingesetzten Distribution.
+Die unveränderten LGPL-3.0- und GPL-3.0-Lizenztexte aus Qt 6.8.3 befinden sich in `docs/licenses/`. Diese Texte gehören zu den Abhängigkeiten und legen keine Lizenz für die LoggX-Quellen fest. Upstream-Quellen: https://download.qt.io/archive/qt/6.8/6.8.3/single/ und https://code.qt.io/qt/ .
 FFmpeg: https://ffmpeg.org/legal.html und `ffmpeg -buildconf` für den lokalen Build.
 `libx264` ist nur verfügbar, wenn der installierte FFmpeg-Build es enthält. Die Lizenzbedingungen eines externen Encoder-Builds sind nicht automatisch die der LoggX-Quellen.
 
