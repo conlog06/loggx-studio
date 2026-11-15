@@ -25,7 +25,7 @@ cp COPYING "$out/sources/x264-COPYING.txt"
 cd "$work"
 tar -xf ffmpeg.tar.xz
 cd "ffmpeg-$version"
-PKG_CONFIG_LIBDIR="$work/prefix/lib/pkgconfig" ./configure --arch=x86_64 --target-os=mingw32 --cross-prefix=x86_64-w64-mingw32- --enable-cross-compile --disable-autodetect --disable-shared --enable-static --enable-gpl --enable-libx264 --pkg-config-flags=--static --extra-ldflags=-static --disable-ffplay --disable-doc --disable-debug
+PKG_CONFIG_LIBDIR="$work/prefix/lib/pkgconfig" ./configure --arch=x86_64 --target-os=mingw32 --cross-prefix=x86_64-w64-mingw32- --enable-cross-compile --disable-autodetect --disable-shared --enable-static --enable-gpl --enable-libx264 --pkg-config=pkg-config --pkg-config-flags=--static --extra-ldflags=-static --disable-ffplay --disable-doc --disable-debug || { tail -n 120 ffbuild/config.log; exit 1; }
 make -j"$(nproc)" ffmpeg.exe ffprobe.exe
 x86_64-w64-mingw32-strip ffmpeg.exe ffprobe.exe
 cp ffmpeg.exe ffprobe.exe "$out/bin/"
