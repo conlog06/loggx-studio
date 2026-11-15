@@ -26,12 +26,12 @@ Video, Audio und Instrumente teilen sich eine Timeline und eine `.loggx`-Projekt
 1. In GitHub unter **Actions → Build and test LoggX Studio** einen erfolgreichen Lauf öffnen und das passende `LoggX-Studio-*`-Artefakt herunterladen.
 2. ZIP vollständig entpacken. Windows: `bin/LoggXStudio.exe`; macOS: `LoggXStudio.app`.
    Zum direkten Ausprobieren unter **Datei → Projekt öffnen** die mitgelieferte Datei `examples/First-Beat.loggx` auswählen und **Wiedergabe** drücken. Dieses Musik-Demo benötigt für die Wiedergabe kein FFmpeg.
-3. FFmpeg inklusive FFprobe separat installieren: [offizielle Downloadseite](https://ffmpeg.org/download.html). Unter **Datei → Einstellungen** beide ausführbaren Programme auswählen. Alternativ deren Ordner in den `PATH` aufnehmen.
+3. **Windows x64:** FFmpeg und FFprobe liegen direkt im entpackten Paket und werden automatisch erkannt. Auf macOS und Linux die [FFmpeg-Werkzeuge](https://ffmpeg.org/download.html) separat installieren und bei Bedarf unter **Datei → Einstellungen** auswählen.
 4. **Importieren**, danach ein Medium im Pool doppelt anklicken. Clips landen an der Abspielposition.
 5. Im Musik-Arbeitsbereich **Neues Pattern** wählen. Im Piano-Roll links klicken, um Noten zu setzen; rechts klicken zum Löschen. Ziehen verschiebt, der rechte Notenrand ändert die Länge.
 6. `.loggx`-Projekt speichern und im Export-Arbeitsbereich eine neue Ausgabedatei wählen.
 
-Die Desktop-Artefakte sind noch nicht signiert oder notarisiert. Ein Installationsprogramm und Release-Signaturen sind noch nicht eingerichtet. FFmpeg wird nicht mitgeliefert. Nur die Encoder, die der installierte FFmpeg-Build und die Hardware unterstützen, funktionieren.
+Die Desktop-Artefakte sind noch nicht signiert oder notarisiert. Ein Installationsprogramm und Release-Signaturen sind noch nicht eingerichtet. Nur die Encoder, die der installierte FFmpeg-Build und die Hardware unterstützen, funktionieren.
 
 ## Selbst bauen
 
