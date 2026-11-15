@@ -158,7 +158,7 @@ void Window::buildUi() {
     edit->addAction("Ripple-Löschen (alle Spuren)",QKeySequence("Shift+Delete"),this,[this] { document_.remove(timeline_->selected(),true); });
     edit->addAction("Verlauf …",this,[this] { auto* dialog = new QDialog(this); dialog->setAttribute(Qt::WA_DeleteOnClose); dialog->setWindowTitle("Bearbeitungsverlauf"); auto* l = new QVBoxLayout(dialog); l->addWidget(new QUndoView(document_.history())); dialog->resize(400,500); dialog->show(); });
     auto* info = menuBar()->addMenu("Hilfe");
-    info->addAction("Erste Schritte",this,[this] { QMessageBox::information(this,"LoggX Studio · Erste Schritte","1. FFmpeg und FFprobe in den Einstellungen auswählen.\n2. Videos oder Audio importieren; per Doppelklick zur Timeline hinzufügen.\n3. Clips ziehen, an den Rändern trimmen und mit Strg+B am Abspielkopf teilen.\n4. Instrumentenspur wählen und Pattern erstellen. Noten links hinzufügen, rechts löschen.\n5. Projekt speichern und unter Export rendern.\n\nLeertaste: Wiedergabe · Strg+S: Speichern · Strg+Z: Rückgängig\n\nVersion 0.1 ist ein technischer Prototyp. Vorschau bis 1280 Pixel Breite; Export bis 1080p. Plugin-Hosting, KI und 8K folgen später."); });
+    info->addAction("Erste Schritte",this,[this] { QMessageBox::information(this,"LoggX Studio · Erste Schritte","1. Unter Windows sind FFmpeg und FFprobe im Paket enthalten. Auf macOS und Linux können sie unter Einstellungen ausgewählt werden.\n2. Videos oder Audio importieren; per Doppelklick zur Timeline hinzufügen.\n3. Clips ziehen, an den Rändern trimmen und mit Strg+B am Abspielkopf teilen.\n4. Instrumentenspur wählen und Pattern erstellen. Noten links hinzufügen, rechts löschen.\n5. Projekt speichern und unter Export rendern.\n\nLeertaste: Wiedergabe · Strg+S: Speichern · Strg+Z: Rückgängig\n\nVersion 0.1 ist ein technischer Prototyp. Vorschau bis 1280 Pixel Breite; Export bis 1080p. Plugin-Hosting, KI und 8K folgen später."); });
     info->addAction("Projekt auf GitHub",this,[] { QDesktopServices::openUrl(QUrl("https://github.com/conlog06/loggx-studio")); });
     auto* root = new QWidget; auto* layout = new QVBoxLayout(root); layout->setContentsMargins(14,8,14,0); layout->setSpacing(10); setCentralWidget(root);
     auto* top = new QHBoxLayout;
@@ -392,7 +392,7 @@ void Window::openPath(const QString& path) {
 }
 void Window::settings() {
     QDialog dialog(this); dialog.setWindowTitle("FFmpeg-Werkzeuge"); auto* l = new QVBoxLayout(&dialog);
-    l->addWidget(help("FFmpeg und FFprobe werden für Import und Export benötigt. Wähle vorhandene Programme oder füge ihren Ordner zum PATH hinzu. LoggX installiert keine Codecs automatisch."));
+    l->addWidget(help("FFmpeg und FFprobe werden für Import und Export benötigt. Wähle vorhandene Programme oder füge ihren Ordner zum PATH hinzu. Das Windows-Paket findet die mitgelieferten Programme automatisch."));
     auto* form = new QFormLayout; auto* ffmpeg = new QLineEdit(findTool("ffmpeg")); auto* ffprobe = new QLineEdit(findTool("ffprobe"));
     for (const auto& pair : {qMakePair(QString("ffmpeg"),ffmpeg),qMakePair(QString("ffprobe"),ffprobe)}) {
         auto* row = new QWidget; auto* h = new QHBoxLayout(row); h->setContentsMargins(0,0,0,0); h->addWidget(pair.second);

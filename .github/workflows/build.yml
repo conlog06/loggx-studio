@@ -10,7 +10,20 @@ concurrency:
   group: build-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  windows-media-tools:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y gcc-mingw-w64-x86-64-posix nasm
+      - run: bash scripts/build-ffmpeg-windows.sh windows-media-tools
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-media-tools
+          path: windows-media-tools/
+          if-no-files-found: error
+          retention-days: 1
   desktop:
+    needs: windows-media-tools
     strategy:
       fail-fast: false
       matrix:
@@ -52,6 +65,26 @@ jobs:
       - name: Include documentation
         shell: bash
         run: cp README.md dist/ && cp -R docs dist/docs && cp -R examples dist/examples
+      - uses: actions/download-artifact@v4
+        if: runner.os == 'Windows'
+        with:
+          name: windows-media-tools
+          path: windows-media-tools
+      - name: Bundle and verify Windows media tools
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Copy-Item windows-media-tools/bin/*.exe dist/bin/
+          Copy-Item windows-media-tools/sources dist/docs/ffmpeg -Recurse
+          $env:PATH = "$env:SystemRoot\System32;$env:SystemRoot"
+          & ./dist/bin/ffmpeg.exe -v error -f lavfi -i testsrc2=size=160x90:rate=24 -f lavfi -i sine=frequency=440 -t 1 -c:v libx264 -c:a aac sample.mp4
+          if ($LASTEXITCODE -ne 0) { throw 'H.264/AAC encoding failed' }
+          & ./dist/bin/ffmpeg.exe -v error -i sample.mp4 -c:a pcm_s24le sample.wav
+          if ($LASTEXITCODE -ne 0) { throw 'WAV encoding failed' }
+          foreach ($file in @('sample.mp4', 'sample.wav')) {
+            & ./dist/bin/ffprobe.exe -v error -show_streams -of json $file
+            if ($LASTEXITCODE -ne 0) { throw "Could not probe $file" }
+          }
       - name: Upload desktop build
         uses: actions/upload-artifact@v4
         with:
