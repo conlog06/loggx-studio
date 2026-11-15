@@ -39,7 +39,7 @@ jobs:
         run: cmake --install build --config Release --prefix "${{ github.workspace }}/dist"
       - name: Native UI smoke test
         if: runner.os == 'Linux'
-        run: build/LoggXStudio --smoke-test native-ui.png
+        run: build/LoggXStudio --smoke-test native-ui.png examples/First-Beat.loggx
         env:
           QT_QPA_PLATFORM: offscreen
       - name: Upload native UI capture
@@ -51,7 +51,7 @@ jobs:
           if-no-files-found: error
       - name: Include documentation
         shell: bash
-        run: cp README.md dist/ && cp -R docs dist/docs
+        run: cp README.md dist/ && cp -R docs dist/docs && cp -R examples dist/examples
       - name: Upload desktop build
         uses: actions/upload-artifact@v4
         with:
